@@ -50,6 +50,10 @@ class Client extends EventEmitter {
         const page = (await browser.pages())[0];
         page.setUserAgent(this.options.userAgent);
 
+        if (this.options.pageAuthenticate) {
+            await page.authenticate({ username: this.options.pageAuthenticate.username, password: this.options.pageAuthenticate.password })
+        }
+
         this.pupBrowser = browser;
         this.pupPage = page;
         
