@@ -32,7 +32,7 @@
     "mime": "^2.4.5",
     "puppeteer": "^3.0.4",
     "puppeteer-extra": "^3.1.13",
-    "puppeteer-extra-plugin-stealth": "^2.4.15",
+    "puppeteer-extra-plugin-stealth": "^2.4.15"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
