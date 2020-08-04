@@ -6,6 +6,9 @@ declare namespace WAWebJS {
 
   export class Client extends EventEmitter {
     constructor(options: ClientOptions)
+    
+    /** Current connection information */
+    public info: ClientInfo
 
     /**Accepts an invitation to join a group */
     acceptInvite(inviteCode: string): Promise<void>
@@ -20,8 +23,6 @@ declare namespace WAWebJS {
      * Create a new group
      * @param name group title
      * @param participants an array of Contacts or contact IDs to add to the group
-     * 
-     * @todo improve return type in the official docs
      */
     createGroup(name: string, participants: Contact[] | string[]): Promise<CreateGroupResult>
 
@@ -49,19 +50,13 @@ declare namespace WAWebJS {
     /** Gets the current connection state for the client */
     getState(): Promise<WAState>
 
-    /** 
-     * Returns the version of WhatsApp Web currently being run
-     * @todo fix the return value in the official docs
-     */
+    /** Returns the version of WhatsApp Web currently being run */
     getWWebVersion(): Promise<string>
 
     /** Sets up events and requirements, kicks off authentication request */
     initialize(): Promise<void>
 
-    /** 
-     * Check if a given ID is registered in whatsapp
-     * @todo add contactId param in the official docs
-     */
+    /** Check if a given ID is registered in whatsapp */
     isRegisteredUser(contactId: string): Promise<boolean>
 
     /**
@@ -92,10 +87,7 @@ declare namespace WAWebJS {
     /** Changes and returns the archive state of the Chat */
     unarchiveChat(chatId: string): Promise<boolean>
 
-    /**
-     * Unmutes the Chat 
-     * @todo add chatId param in the official docs
-     */
+    /** Unmutes the Chat */
     unmuteChat(chatId: string): Promise<void>
 
     /** Generic event */
@@ -197,25 +189,61 @@ declare namespace WAWebJS {
     on(event: 'ready', listener: () => void): this
   }
 
-  /**
-   * Options for initializing the whatsapp client
-   * @todo add these in the official docs
-   */
+  /** Current connection information */
+  export interface ClientInfo {
+    /** Current user ID */
+    me: ContactId
+    /** Information about the phone this client is connected to */
+    phone: ClientInfoPhone
+    /** Platform the phone is running on */
+    platform: string
+    /** Name configured to be shown in push notifications */
+    pushname: string
+
+    /** Get current battery percentage and charging status for the attached device */
+    getBatteryStatus: () => Promise<BatteryInfo>
+  }
+
+  /** Information about the phone this client is connected to */
+  export interface ClientInfoPhone {
+    /** WhatsApp Version running on the phone */
+    wa_version: string
+    /** OS Version running on the phone (iOS or Android version) */
+    os_version: string
+    /** Device manufacturer */
+    device_manufacturer: string
+    /** Device model */
+    device_model: string
+    /** OS build number */
+    os_build_number: string
+  }
+
+  /** Options for initializing the whatsapp client */
   export interface ClientOptions {
-    puppeteer?: puppeteer.LaunchOptions
-    /** Whatsapp session to restore. If not set, will start a new session  */
-    session?: ClientSession,
-    /** @default 45000 */
-    qrTimeoutMs?: number,
-    /** @default 20000 */
-    qrRefreshIntervalMs?: number,
-    /** @default 45000 */
+    /** Timeout for authentication selector in puppeteer
+     * @default 45000 */
     authTimeoutMs?: number,
-    /** @default false */
+    /** Puppeteer launch options. View docs here: https://github.com/puppeteer/puppeteer/ */
+    puppeteer?: puppeteer.LaunchOptions
+    /** Refresh interval for qr code (how much time to wait before checking if the qr code has changed)
+     * @default 20000 */
+    qrRefreshIntervalMs?: number
+    /** Timeout for qr code selector in puppeteer
+     * @default 45000 */
+    qrTimeoutMs?: number,
+    /** Restart client with a new session (i.e. use null 'session' var) if authentication fails
+     * @default false */
+    restartOnAuthFail?: boolean
+    /** Whatsapp session to restore. If not set, will start a new session */
+    session?: ClientSession
+    /** If another whatsapp web session is detected (another browser), take over the session in the current browser
+     * @default false */
     takeoverOnConflict?: boolean,
-    /** @default 0 */
+    /** How much time to wait before taking over the session
+     * @default 0 */
     takeoverTimeoutMs?: number,
-    /** @default 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36' */
+    /** User agent to use in puppeteer.
+     * @default 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36' */
     userAgent?: string
   }
 
@@ -271,6 +299,12 @@ declare namespace WAWebJS {
     reply: (content: MessageContent, options: MessageSendOptions) => Promise<Message>,
 
   }
+
+  /** whatsapp web url */
+  export const WhatsWebURL: string
+  
+  /** default client options */
+  export const DefaultOptions: ClientOptions
 
   /** Chat types */
   export enum ChatTypes {
@@ -425,7 +459,7 @@ declare namespace WAWebJS {
      */
     to: string,
     /** Message type */
-    type: string,
+    type: MessageTypes,
 
     /** Deletes the message from the chat */
     delete: (everyone?: boolean) => Promise<void>,
@@ -461,10 +495,23 @@ declare namespace WAWebJS {
     longitude: string,
   }
 
-  /**
-   * Options for sending a message
-   * @todo add more specific type for the object */
-  export type MessageSendOptions = object
+  /** Options for sending a message */
+  export interface MessageSendOptions {
+    /** Show links preview */
+    linkPreview?: boolean
+    /** Send audio as voice message */
+    sendAudioAsVoice?: boolean
+    /** Image or videos caption */
+    caption?: string
+    /** Id of the message that is being quoted (or replied to) */
+    quotedMessageId?: string
+    /** Contacts that are being mentioned in the message */
+    mentions?: Contact[]
+    /** Send 'seen' status */
+    sendSeen?: boolean
+    /** Media to be sent */
+    media?: MessageMedia
+  }
 
   export interface MessageMedia {
     data: string,
