@@ -69,3 +69,6 @@ typings/
 
 # Test sessions
 *session.json
+
+# Jetbrains IDEs
+.idea

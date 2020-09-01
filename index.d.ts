@@ -193,6 +193,9 @@ declare namespace WAWebJS {
 
     /** Emitted when the client has initialized and is ready to receive messages */
     on(event: 'ready', listener: () => void): this
+
+    /** Emitted when the client has initialized and is ready to receive messages */
+    on(event: 'init_error', listener: (error: string) => void): this
   }
 
   /** Current connection information */
@@ -337,6 +340,7 @@ declare namespace WAWebJS {
     DISCONNECTED = 'disconnected',
     STATE_CHANGED = 'change_state',
     BATTERY_CHANGED = 'change_battery',
+    INIT_ERROR = 'init_error',
   }
 
   /** Group notification types */
