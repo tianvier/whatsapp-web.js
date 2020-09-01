@@ -46,7 +46,7 @@ class Chat extends Base {
         this.unreadCount = data.unreadCount;
 
         /**
-         * Unix timestamp for when the chat was created
+         * Unix timestamp for when the last activity occurred
          * @type {number}
          */
         this.timestamp = data.t;
@@ -185,6 +185,14 @@ class Chat extends Base {
             window.WWebJS.sendChatstate('stop', chatId);
             return true;
         }, this.id._serialized);
+    }
+
+    /**
+     * Returns the Contact that corresponds to this Chat.
+     * @returns {Promise<Contact>}
+     */
+    async getContact() {
+        return await this.client.getContactById(this.id._serialized);
     }
 }
 

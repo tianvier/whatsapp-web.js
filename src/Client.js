@@ -91,7 +91,7 @@ class Client extends EventEmitter {
             timeout: 0,
         });
 
-        const KEEP_PHONE_CONNECTED_IMG_SELECTOR = '[data-asset-intro-image-light="true"]';
+        const KEEP_PHONE_CONNECTED_IMG_SELECTOR = '[data-asset-intro-image-light="true"], [data-asset-intro-image-dark="true"]';
 
         if (this.options.session) {
             // Check if session restore was successfull 
@@ -561,6 +561,17 @@ class Client extends EventEmitter {
         await this.pupPage.evaluate(async status => {
             return await window.Store.Wap.sendSetStatus(status);
         }, status);
+    }
+
+    /**
+     * Sets the current user's display name. 
+     * This is the name shown to WhatsApp users that have not added you as a contact beside your number in groups and in your profile.
+     * @param {string} displayName New display name
+     */
+    async setDisplayName(displayName) {
+        await this.pupPage.evaluate(async displayName => {
+            return await window.Store.Wap.setPushname(displayName);
+        }, displayName);
     }
 
     /**

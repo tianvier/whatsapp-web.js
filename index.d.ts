@@ -6,7 +6,7 @@ declare namespace WAWebJS {
 
   export class Client extends EventEmitter {
     constructor(options: ClientOptions)
-    
+
     /** Current connection information */
     public info: ClientInfo
 
@@ -70,7 +70,7 @@ declare namespace WAWebJS {
     resetState(): Promise<void>
 
     /** Send a message to a specific chatId */
-    sendMessage(chatId: string, content: MessageContent, options: MessageSendOptions): Promise<Message>
+    sendMessage(chatId: string, content: MessageContent, options?: MessageSendOptions): Promise<Message>
 
     /** Marks the client as online */
     sendPresenceAvailable(): Promise<void>
@@ -83,6 +83,12 @@ declare namespace WAWebJS {
      * @param status New status message
      */
     setStatus(status: string): Promise<void>
+
+    /** 
+     * Sets the current user's display name
+     * @param displayName New display name
+     */
+    setDisplayName(displayName: string): Promise<void>
 
     /** Changes and returns the archive state of the Chat */
     unarchiveChat(chatId: string): Promise<boolean>
@@ -296,13 +302,13 @@ declare namespace WAWebJS {
     /** Returns the Contacts affected by this GroupNotification */
     getRecipients: () => Promise<Contact[]>,
     /** Sends a message to the same chat this GroupNotification was produced in */
-    reply: (content: MessageContent, options: MessageSendOptions) => Promise<Message>,
+    reply: (content: MessageContent, options?: MessageSendOptions) => Promise<Message>,
 
   }
 
   /** whatsapp web url */
   export const WhatsWebURL: string
-  
+
   /** default client options */
   export const DefaultOptions: ClientOptions
 
@@ -478,7 +484,11 @@ declare namespace WAWebJS {
      * If chatId is specified, it will be sent through the specified Chat.
      * If not, it will send the message in the same Chat as the original message was sent. 
      */
-    reply: (content: MessageContent, chatId: string, options: MessageSendOptions) => Promise<Message>,
+    reply: (content: MessageContent, chatId?: string, options?: MessageSendOptions) => Promise<Message>,
+    /** 
+     * Forwards this message to another chat
+     */
+    forward: (chat: Chat | string) => Promise<void>,
   }
 
   /** ID that represents a message */
@@ -513,12 +523,24 @@ declare namespace WAWebJS {
     media?: MessageMedia
   }
 
-  export interface MessageMedia {
-    data: string,
-    mimetype: string,
-    filename?: string | null,
+  /** Media attached to a message */
+  export class MessageMedia {
+    /** MIME type of the attachment */
+    mimetype: string
+    /** Base64-encoded data of the file */
+    data: string
+    /** Document file name. Value can be null */
+    filename?: string | null
 
-    fromFilePath: (filePath: string) => MessageMedia,
+    /**
+     * @param {string} mimetype MIME type of the attachment
+     * @param {string} data Base64-encoded data of the file
+     * @param {?string} filename Document file name. Value can be null
+     */
+    constructor(mimetype: string, data: string, filename?: string | null)
+
+    /** Creates a MessageMedia instance from a local file path */
+    static fromFilePath: (filePath: string) => MessageMedia
   }
 
   export type MessageContent = string | MessageMedia | Location
@@ -592,6 +614,11 @@ declare namespace WAWebJS {
 
     /** Returns the contact's profile picture URL, if privacy settings allow it */
     getProfilePicUrl: () => Promise<string>,
+
+    /** Returns the Chat that corresponds to this Contact.  
+     * Will return null when getting chat for currently logged in user.
+     */
+    getChat: () => Promise<Chat>,
   }
 
   export interface ContactId {
@@ -641,7 +668,7 @@ declare namespace WAWebJS {
     isReadOnly: boolean,
     /** Title of the chat */
     name: string,
-    /** Unix timestamp for when the chat was created */
+    /** Unix timestamp for when the last activity occurred */
     timestamp: number,
     /** Amount of messages unread */
     unreadCount: number,
@@ -670,6 +697,8 @@ declare namespace WAWebJS {
     unarchive: () => Promise<void>,
     /** Unmutes this chat */
     unmute: () => Promise<void>,
+    /** Returns the Contact that corresponds to this Chat. */
+    getContact: () => Promise<Contact>,
   }
 
   export interface MessageSearchOptions {
