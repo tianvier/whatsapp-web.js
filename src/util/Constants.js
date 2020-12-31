@@ -49,7 +49,9 @@ exports.Events = {
     DISCONNECTED: 'disconnected',
     STATE_CHANGED: 'change_state',
     BATTERY_CHANGED: 'change_battery',
-    INIT_ERROR: 'init_error'
+    INIT_ERROR: 'init_error',
+    LAUNCH_ERROR: 'launch_error',
+    QR_ERROR: 'qr_error',
 };
 
 /**
