@@ -118,11 +118,7 @@ class Client extends EventEmitter {
                      * @param {string} message
                      */
                     this.emit(Events.AUTHENTICATION_FAILURE, 'Unable to log in. Are the session details valid?');
-                    if (this.options.browserless) {
-                        browser.disconnect();
-                    } else {
-                        browser.close();
-                    }
+                    browser && await browser.close();
                     if (this.options.restartOnAuthFail) {
                         // session restore failed so try again but without session to force new authentication
                         this.options.session = null;
@@ -404,12 +400,7 @@ class Client extends EventEmitter {
         if (this._qrRefreshInterval) {
             clearInterval(this._qrRefreshInterval);
         }
-        //await this.pupBrowser.close();
-        if (this.options.browserless) {
-            await this.pupBrowser.disconnect();
-        } else {
-            await this.pupBrowser.close();
-        }
+        this.pupBrowser && await this.pupBrowser.close();
     }
 
     /**
