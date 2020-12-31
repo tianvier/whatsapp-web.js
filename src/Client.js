@@ -131,7 +131,13 @@ class Client extends EventEmitter {
             }
 
         } else {
+            let getQrCodeRetryTimes = 0
             const getQrCode = async () => {
+                // Emitted when get qr code over times
+                getQrCodeRetryTimes++
+                if (getQrCodeRetryTimes > this.options.retryGetQrCode) {
+                    this.emit(Events.QR_ERROR, 'get qr code over times !');
+                }
                 // Check if retry button is present
                 var QR_RETRY_SELECTOR = 'div[data-ref] > span > div';
                 var qrRetry = await page.$(QR_RETRY_SELECTOR);
@@ -142,14 +148,14 @@ class Client extends EventEmitter {
                 // Wait for QR Code
 
                 const QR_CANVAS_SELECTOR = 'canvas';
-                await page.waitForSelector(QR_CANVAS_SELECTOR, { timeout: this.options.qrTimeoutMs });
+                await page.waitForSelector(QR_CANVAS_SELECTOR, {timeout: this.options.qrTimeoutMs});
                 const qrImgData = await page.$eval(QR_CANVAS_SELECTOR, canvas => [].slice.call(canvas.getContext('2d').getImageData(0, 0, 264, 264).data));
                 const qr = jsQR(qrImgData, 264, 264).data;
                 /**
-                * Emitted when the QR code is received
-                * @event Client#qr
-                * @param {string} qr QR Code
-                */
+                 * Emitted when the QR code is received
+                 * @event Client#qr
+                 * @param {string} qr QR Code
+                 */
                 this.emit(Events.QR_RECEIVED, qr);
             };
             getQrCode();
