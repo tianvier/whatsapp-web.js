@@ -98,11 +98,14 @@ class Client extends EventEmitter {
                     localStorage.setItem('WAToken2', session.WAToken2);
                 }, this.options.session);
         }
-
-        await page.goto(WhatsWebURL, {
-            waitUntil: 'load',
-            timeout: 0,
-        });
+        try {
+            await page.goto(WhatsWebURL, {
+                waitUntil: 'load',
+                timeout: this.options.goPageTimeoutMs,
+            });
+        } catch (e) {
+            this.emit(Events.GO_PAGE_ERROR, 'open page timeout:' + (e.message).toString());
+        }
 
         const KEEP_PHONE_CONNECTED_IMG_SELECTOR = '[data-asset-intro-image-light="true"], [data-asset-intro-image-dark="true"]';
 

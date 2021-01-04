@@ -15,7 +15,8 @@ exports.DefaultOptions = {
     takeoverTimeoutMs: 0,
     userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36',
     ffmpegPath: 'ffmpeg',
-    retryGetQrCode: 5
+    retryGetQrCode: 5,
+    goPageTimeoutMs: 30000
 };
 
 /**
@@ -54,6 +55,7 @@ exports.Events = {
     INIT_ERROR: 'init_error',
     LAUNCH_ERROR: 'launch_error',
     QR_ERROR: 'qr_error',
+    GO_PAGE_ERROR: 'go_page_error'
 };
 
 /**
