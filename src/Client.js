@@ -105,6 +105,7 @@ class Client extends EventEmitter {
             });
         } catch (e) {
             this.emit(Events.GO_PAGE_ERROR, 'open page timeout:' + (e.message).toString());
+            browser && await browser.close();
         }
 
         const KEEP_PHONE_CONNECTED_IMG_SELECTOR = '[data-asset-intro-image-light="true"], [data-asset-intro-image-dark="true"]';
@@ -140,6 +141,7 @@ class Client extends EventEmitter {
                 getQrCodeRetryTimes++
                 if (getQrCodeRetryTimes > this.options.retryGetQrCode) {
                     this.emit(Events.QR_ERROR, 'get qr code over times !');
+                    browser && await browser.close();
                 }
                 // Check if retry button is present
                 var QR_RETRY_SELECTOR = 'div[data-ref] > span > div';
