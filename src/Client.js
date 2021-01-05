@@ -64,7 +64,7 @@ class Client extends EventEmitter {
      * Sets up events and requirements, kicks off authentication request
      */
     async initialize() {
-        let browser
+        let browser;
         if (this.options.browserless) {
             try {
                 browser = await puppeteer.connect(this.options.browserless);
@@ -72,6 +72,9 @@ class Client extends EventEmitter {
                 this.emit(Events.LAUNCH_ERROR, (launchError.message).toString());
             }
         } else {
+            const puppeteer = require('puppeteer-extra');
+            const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+            puppeteer.use(StealthPlugin());
             browser = await puppeteer.launch(this.options.puppeteer);
         }
         
