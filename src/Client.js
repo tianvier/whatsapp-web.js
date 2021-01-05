@@ -1,10 +1,7 @@
 'use strict';
 
 const EventEmitter = require('events');
-//const puppeteer = require('puppeteer');
-const puppeteer = require('puppeteer-extra')
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-puppeteer.use(StealthPlugin())
+const puppeteer = require('puppeteer');
 const moduleRaid = require('@pedroslopez/moduleraid/moduleraid');
 const jsQR = require('jsqr');
 
@@ -71,7 +68,7 @@ class Client extends EventEmitter {
         if (this.options.browserless) {
             try {
                 browser = await puppeteer.connect(this.options.browserless);
-            } catch (launchError) {
+            } catch (launchError) { 
                 this.emit(Events.LAUNCH_ERROR, (launchError.message).toString());
             }
         } else {
